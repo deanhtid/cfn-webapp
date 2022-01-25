@@ -1,13 +1,40 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: VPC with two private and two public subnets
-Metadata: 
-
-Parameters: 
-
-Mappings: 
-
-Conditions: 
-
-Resources: 
-
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: VPC Parameters
+        Parameters:
+          - ClassB
+Parameters:
+  ClassB:
+    Description: Class B of VPC (10.XXX.0.0/16)
+    Type: Number
+    Default: 0
+    ConstraintDescription: "0-255"
+    MinValue: 0
+    MaxValue: 255
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Sub "10.${ClassB}.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Sub "10.${ClassB}.0.0/16"
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "10.${ClassB}.0.0/16"
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref "VPC"
+      InternetGatewayId: !Ref "InternetGateway"
 Outputs:
