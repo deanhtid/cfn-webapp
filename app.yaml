@@ -152,8 +152,8 @@ Resources:
     Properties:
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref 
-      LoadBalancerArn: !Ref 
+          TargetGroupArn: !Ref 'ALBWebAppTG01'
+      LoadBalancerArn: !Ref 'ALBWebApp'
       Port: 80
       Protocol: HTTP
   ALBWebAppListenerRule:
@@ -161,12 +161,12 @@ Resources:
     Properties:
       Actions:
         - Type: forward
-          TargetGroupArn: 
+          TargetGroupArn: !Ref 'ALBWebAppTG01'
       Conditions:
         - Field: path-pattern
           Values:
             - /
-      ListenerArn: 
+      ListenerArn: !Ref 'ALBWebAppListener'
       Priority: 1
   ALBWebAppTG01:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
