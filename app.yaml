@@ -1,13 +1,36 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: WebApp Template using ECS, Autoscaling, and CloudWatch
-Metadata: 
-
-Parameters: 
-
-Mappings: 
-
-Conditions: 
-
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Parent Stack
+        Parameters:
+          - ParentVPCStack
+Parameters:
+  ParentVPCStack:
+    Description: Stack name of the VPC Template
+    Type: String
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Key for ssh access
+    Default: dev
+  DesiredCapacity:
+    Type: Number
+    Default: '2'
+    Description: Number of instances
+  MaxSize:
+    Type: Number
+    Default: '4'
+    Description: Max number of instances
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+  ImageID:
+    Description: Latest ECS optimised amazon Linux 2 Image eu-west-2
+    Type: AWS::EC2::Image::Id
+    Default: ami-0229ad66a59113c47
 Resources: 
 
 Outputs:
