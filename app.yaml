@@ -388,3 +388,14 @@ Resources:
       Roles:
         - !Ref 'InstanceRole'
 Outputs:
+  WebAppService:
+    Value: !Ref 'WebAppService'
+  ecscluster:
+    Value: !Ref 'ECSCluster'
+  ECSALB:
+    Description: WebApp URL
+    Value: !Join
+      - ''
+      - - !GetAtt 'ALBWebApp.DNSName'
+  TaskDef:
+    Value: !Ref 'WebAppTaskDefinition'
