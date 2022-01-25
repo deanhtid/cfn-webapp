@@ -145,4 +145,74 @@ Resources:
       RouteTableId: !Ref "RouteTablePublicB"
       DestinationCidrBlock: "0.0.0.0/0"
       GatewayId: !Ref "InternetGateway"
+  NACLPublic:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: Public
+  NACLPrivate:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: Private
+  SubnetNACLAssociationPublicA:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref "SubnetPublicA"
+      NetworkAclId: !Ref "NACLPublic"
+  SubnetNACLAssociationPrivateA:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref "SubnetPrivateA"
+      NetworkAclId: !Ref "NACLPrivate"
+  SubnetNACLAssociationPublicB:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref "SubnetPublicB"
+      NetworkAclId: !Ref "NACLPublic"
+  SubnetNACLAssociationPrivateB:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      SubnetId: !Ref "SubnetPrivateB"
+      NetworkAclId: !Ref "NACLPrivate"
+  NACLEntryInPublicAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref "NACLPublic"
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: false
+      CidrBlock: "0.0.0.0/0"
+  NACLEntryOutPublicAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref "NACLPublic"
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      CidrBlock: "0.0.0.0/0"
+  NACLEntryInPrivateAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref "NACLPrivate"
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: false
+      CidrBlock: "0.0.0.0/0"
+  NACLEntryOutPrivateAllowAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref "NACLPrivate"
+      RuleNumber: 99
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      CidrBlock: "0.0.0.0/0"
 Outputs:
