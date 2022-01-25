@@ -237,4 +237,21 @@ Resources:
             - '         --region '
             - !Ref 'AWS::Region'
             - "\n"
+ WebAppService:
+    Type: AWS::ECS::Service
+    DependsOn: ALBWebAppListener
+    Properties:
+      Cluster: !Ref 'ECSCluster'
+      DesiredCount: 1
+      LoadBalancers:
+        - ContainerName: webapp
+          ContainerPort: 80
+          TargetGroupArn: !Ref 'ALBWebAppTG01'
+      Role: !Ref 'ServiceRole'
+      TaskDefinition: !Ref 'WebAppTaskDefinition'
+      Tags:
+        - Key: Name
+          Value: WebAppService
+        - Key: Environment
+          Value: Development
 Outputs:
