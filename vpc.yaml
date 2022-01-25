@@ -235,7 +235,7 @@ Resources:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: !Ref 'NATEIPB'
-      SubnetId: !Ref 'SubnetPublicA'
+      SubnetId: !Ref 'SubnetPublicB'
       Tags:
         - Key: Name
           Value: NAT-B
@@ -373,3 +373,13 @@ Outputs:
     Value: !Ref "RouteTablePrivateB"
     Export:
       Name: !Sub "${AWS::StackName}-RouteTableBPrivate"
+  NATIPA:
+    Description: The public IP address of NAT gateway A.
+    Value: !Ref 'NATEIPA'
+    Export:
+      Name: !Sub '${AWS::StackName}-NATIPA'
+  NATIPB:
+    Description: The public IP address of NAT gateway A.
+    Value: !Ref 'NATEIPB'
+    Export:
+      Name: !Sub '${AWS::StackName}-NATIPB'
