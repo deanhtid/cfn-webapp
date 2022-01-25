@@ -31,7 +31,7 @@ The architecture consists of:
 - The app url will be provided in the stack outputs
 - Test the app is working by following the url in your favourite browser
 
-# Todo
+### Todo
 - Review IAM policies and lock down to least privilege
 - Use HTTPS
  - create a certificate using ACM and assign to the listener
