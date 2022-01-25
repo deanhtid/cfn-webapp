@@ -79,4 +79,51 @@ Resources:
         - - ECSCWLogGroup
           - !Ref 'AWS::StackName'
       RetentionInDays: 14
+  WebAppTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Join
+        - ''
+        - - !Ref 'AWS::StackName'
+          - -webapp
+      ContainerDefinitions:
+        - Name: webapp
+          Cpu: 10
+          Essential: true
+          Image: httpd:2.4
+          Memory: 300
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'ECSCWLogGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: webapp
+          MountPoints:
+            - ContainerPath: /usr/local/apache2/htdocs
+              SourceVolume: webapp-vol
+          PortMappings:
+            - ContainerPort: 80
+        - Name: utils
+          Cpu: 10
+          Command:
+            - >-
+              /bin/sh -c "while true; do echo '<html> <head> <title>Deans Web Application</title> <style>body {margin-top: 40px; background-color: #8b0000;} </style> </head><body> <div style=color:white;text-align:center>
+              <h1>Deans Web Application</h1> <h2>Hello Trevor and Ian</h2> <p>SaleCycle is Awesome</p>' > top; /bin/date > date ; echo '</div></body></html>' > bottom; cat top date bottom > /usr/local/apache2/htdocs/index.html
+              ; sleep 1; done"
+          EntryPoint:
+            - sh
+            - -c
+          Essential: false
+          Image: busybox
+          Memory: 200
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref 'ECSCWLogGroup'
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: webapp
+          VolumesFrom:
+            - SourceContainer: webapp
+      Volumes:
+        - Name: webapp-vol
 Outputs:
