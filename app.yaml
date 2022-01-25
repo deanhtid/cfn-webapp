@@ -71,4 +71,12 @@ Resources:
       ToPort: 80
       SourceSecurityGroupId: !Ref 'SGALB'
       Description: HTTP ALB
+  ECSCWLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join
+        - '-'
+        - - ECSCWLogGroup
+          - !Ref 'AWS::StackName'
+      RetentionInDays: 14
 Outputs:
