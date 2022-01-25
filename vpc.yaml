@@ -242,13 +242,13 @@ Resources:
   NATARoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref 'RouteTablePublicA'
+      RouteTableId: !Ref 'RouteTablePrivateA'
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref 'NATGatewayA'
   NATBRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref 'RouteTablePublicB'
+      RouteTableId: !Ref 'RouteTablePrivateB'
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref 'NATGatewayB'
 Outputs:
