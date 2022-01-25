@@ -222,7 +222,7 @@ Resources:
   NATGatewayA:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !Ref 'NATEIPA'
+      AllocationId: !GetAtt 'NATEIPA.AllocationId'
       SubnetId: !Ref 'SubnetPublicA'
       Tags:
         - Key: Name
@@ -234,7 +234,7 @@ Resources:
   NATGatewayB:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !Ref 'NATEIPB'
+      AllocationId: !GetAtt 'NATEIPB.AllocationId'
       SubnetId: !Ref 'SubnetPublicB'
       Tags:
         - Key: Name
