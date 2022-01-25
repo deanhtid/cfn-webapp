@@ -188,4 +188,27 @@ Resources:
           Value: ALBWebAppTG01
         - Key: Environment
           Value: Development
+  WebAppScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !ImportValue
+          Fn::Sub: ${ParentVPCStack}-SubnetAPrivate
+        - !ImportValue
+          Fn::Sub: ${ParentVPCStack}-SubnetBPrivate
+      LaunchConfigurationName: !Ref ''
+      MinSize: '2'
+      MaxSize: !Ref 'MaxSize'
+      DesiredCapacity: !Ref 'DesiredCapacity'
+      Tags:
+        - Key: Name
+          Value: WebApp
+        - Key: Environment
+          Value: Development
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
 Outputs:
