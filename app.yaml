@@ -32,5 +32,43 @@ Parameters:
     Type: AWS::EC2::Image::Id
     Default: ami-0229ad66a59113c47
 Resources: 
-
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: WebAppCluster
+      Tags:
+        - Key: Name
+          Value: WebAppCluster
+        - Key: Environment
+          Value: Development
+  SGALB:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for the Application Load Balancer
+      VpcId: !ImportValue
+        Fn::Sub: ${ParentVPCStack}-VPC
+  SGWebAPP:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for the Web Application
+      VpcId: !ImportValue
+        Fn::Sub: ${ParentVPCStack}-VPC
+  SGALBHTTPinbound:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'SGALB'
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: '0.0.0.0/0'
+      Description: HTTP Internet
+  SGSGWebfromALB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref 'SGWebAPP'
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref 'SGALB'
+      Description: HTTP ALB
 Outputs:
