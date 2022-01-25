@@ -126,4 +126,66 @@ Resources:
             - SourceContainer: webapp
       Volumes:
         - Name: webapp-vol
+  ALBWebApp:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: ALBWebApp
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '30'
+      Subnets:
+        - !ImportValue
+          Fn::Sub: ${ParentVPCStack}-SubnetAPublic
+        - !ImportValue
+          Fn::Sub: ${ParentVPCStack}-SubnetBPublic
+      SecurityGroups:
+        - !Ref 'SGALB'
+      Tags:
+        - Key: Name
+          Value: ALBWebApp
+        - Key: Environment
+          Value: Development
+  ALBWebAppListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    DependsOn: ServiceRole
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref 
+      LoadBalancerArn: !Ref 
+      Port: 80
+      Protocol: HTTP
+  ALBWebAppListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: 
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /
+      ListenerArn: 
+      Priority: 1
+  ALBWebAppTG01:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: ALBWebApp
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Name: ALBWebAppTG01
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 2
+      VpcId: !ImportValue
+        Fn::Sub: ${ParentVPCStack}-VPC
+      Tags:
+        - Key: Name
+          Value: ALBWebAppTG01
+        - Key: Environment
+          Value: Development
 Outputs:
