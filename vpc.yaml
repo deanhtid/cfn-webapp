@@ -42,10 +42,10 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - !GetAZs ""
-      CidrBlock: !Sub "10.${ClassB}.0.0/20"
+        - !GetAZs ''
+      CidrBlock: !Sub '10.${ClassB}.0.0/20'
       MapPublicIpOnLaunch: true
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Public A
@@ -54,9 +54,9 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - !GetAZs ""
-      CidrBlock: !Sub "10.${ClassB}.16.0/20"
-      VpcId: !Ref "VPC"
+        - !GetAZs ''
+      CidrBlock: !Sub '10.${ClassB}.16.0/20'
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Private A
@@ -65,10 +65,10 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 1
-        - !GetAZs ""
-      CidrBlock: !Sub "10.${ClassB}.32.0/20"
+        - !GetAZs ''
+      CidrBlock: !Sub '10.${ClassB}.32.0/20'
       MapPublicIpOnLaunch: true
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Public B
@@ -77,74 +77,74 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 1
-        - !GetAZs ""
-      CidrBlock: !Sub "10.${ClassB}.48.0/20"
-      VpcId: !Ref "VPC"
+        - !GetAZs ''
+      CidrBlock: !Sub '10.${ClassB}.48.0/20'
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Private B
-  RouteTablePublic:
+  RouteTablePublicA:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Public A
-  RouteTablePrivate:
+  RouteTablePrivateA:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Private A
   RouteTablePublicB:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Public B
   RouteTablePrivateB:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref "VPC"
+      VpcId: !Ref 'VPC'
       Tags:
         - Key: Name
           Value: Private B
   RouteTableAssociationPublicA:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref "SubnetPublicA"
-      RouteTableId: !Ref "RouteTablePublic"
+      SubnetId: !Ref 'SubnetPublicA'
+      RouteTableId: !Ref 'RouteTablePublicA'
   RouteTableAssociationPrivateA:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref "SubnetPrivateA"
-      RouteTableId: !Ref "RouteTablePrivate"
+      SubnetId: !Ref 'SubnetPrivateA'
+      RouteTableId: !Ref 'RouteTablePrivateA'
   RouteTableAssociationPublicB:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref "SubnetPublicB"
-      RouteTableId: !Ref "RouteTablePublicB"
+      SubnetId: !Ref 'SubnetPublicB'
+      RouteTableId: !Ref 'RouteTablePublicB'
   RouteTableAssociationPrivateB:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref "SubnetPrivateB"
-      RouteTableId: !Ref "RouteTablePrivateB"
+      SubnetId: !Ref 'SubnetPrivateB'
+      RouteTableId: !Ref 'RouteTablePrivateB'
   RouteTablePublicInternetRoute:
     Type: AWS::EC2::Route
     DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref "RouteTablePublic"
-      DestinationCidrBlock: "0.0.0.0/0"
-      GatewayId: !Ref "InternetGateway"
+      RouteTableId: !Ref 'RouteTablePublicA'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
   RouteTablePublicBInternetRoute:
     Type: AWS::EC2::Route
     DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref "RouteTablePublicB"
-      DestinationCidrBlock: "0.0.0.0/0"
-      GatewayId: !Ref "InternetGateway"
+      RouteTableId: !Ref 'RouteTablePublicB'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
   NACLPublic:
     Type: AWS::EC2::NetworkAcl
     Properties:
@@ -215,6 +215,42 @@ Resources:
       RuleAction: allow
       Egress: true
       CidrBlock: "0.0.0.0/0"
+  NATEIPA:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NATGatewayA:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !Ref 'NATEIPA'
+      SubnetId: !Ref 'SubnetPublicA'
+      Tags:
+        - Key: Name
+          Value: NAT-A
+  NATEIPB:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  NATGatewayB:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !Ref 'NATEIPB'
+      SubnetId: !Ref 'SubnetPublicA'
+      Tags:
+        - Key: Name
+          Value: NAT-B
+  NATARoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref 'RouteTablePublicA'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGatewayA'
+  NATBRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref 'RouteTablePublicB'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NATGatewayB'
 Outputs:
   StackName:
     Description: Stack name.
@@ -285,7 +321,7 @@ Outputs:
     Description: Route tables private.
     Value: !Join
       - ","
-      - - !Ref "RouteTablePrivate"
+      - - !Ref "RouteTablePrivateA"
         - !Ref "RouteTablePrivateB"
     Export:
       Name: !Sub "${AWS::StackName}-RouteTablesPrivate"
@@ -293,7 +329,7 @@ Outputs:
     Description: Route tables public.
     Value: !Join
       - ","
-      - - !Ref "RouteTablePublic"
+      - - !Ref "RouteTablePublicA"
         - !Ref "RouteTablePublicB"
     Export:
       Name: !Sub "${AWS::StackName}-RouteTablesPublic"
@@ -304,7 +340,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-SubnetAPublic"
   RouteTableAPublic:
     Description: Route table A public.
-    Value: !Ref "RouteTablePublic"
+    Value: !Ref "RouteTablePublicA"
     Export:
       Name: !Sub "${AWS::StackName}-RouteTableAPublic"
   SubnetAPrivate:
@@ -314,7 +350,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-SubnetAPrivate"
   RouteTableAPrivate:
     Description: Route table A private.
-    Value: !Ref "RouteTablePrivate"
+    Value: !Ref "RouteTablePrivateA"
     Export:
       Name: !Sub "${AWS::StackName}-RouteTableAPrivate"
   SubnetBPublic:
