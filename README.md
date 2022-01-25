@@ -9,12 +9,16 @@ A modern automated, highly available web application written in CloudFormation u
 - CloudWatch
 - Application Load Balancer
 - AutoScaling Groups
+- NAT Gateways
+- Internet Gateway
 
 The architecture consists of: 
 
 - Two Private Subnets where the app is hosted
 - Two Public Subnets hosting the Application Load Balancer
 - Users will access the application through a public DNS endpoint (provided by cloudformation)
+
+As part of the deployment i've utilised busybox which is a docker container that has a bunch of utilities allowing me to to script and apply the html, css etc
 
 ## Requirements 
 - AWS Account
@@ -42,6 +46,7 @@ The architecture consists of:
 - Further lock down the security groups and ACL's
 - Explicitly define outbound traffic in the SG's
 - I can fully automate the deployment process but I prefer to split out each section hence the two files
+- Add an Web Application Firewall to the ALB
 
 
 
