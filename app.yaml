@@ -196,19 +196,45 @@ Resources:
           Fn::Sub: ${ParentVPCStack}-SubnetAPrivate
         - !ImportValue
           Fn::Sub: ${ParentVPCStack}-SubnetBPrivate
-      LaunchConfigurationName: !Ref ''
+      LaunchConfigurationName: !Ref 'WebAppInstances'
       MinSize: '2'
       MaxSize: !Ref 'MaxSize'
       DesiredCapacity: !Ref 'DesiredCapacity'
       Tags:
         - Key: Name
           Value: WebApp
+          PropagateAtLaunch: true
         - Key: Environment
           Value: Development
+          PropagateAtLaunch: true
     CreationPolicy:
       ResourceSignal:
         Timeout: PT15M
     UpdatePolicy:
       AutoScalingReplacingUpdate:
         WillReplace: true
+  WebAppInstances:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref 'ImageID'
+      SecurityGroups:
+        - !Ref 'SGWebAPP'
+      InstanceType: !Ref 'InstanceType'
+      IamInstanceProfile: !Ref ''
+      KeyName: !Ref 'KeyName'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - "#!/bin/bash -xe\n"
+            - echo ECS_CLUSTER=
+            - !Ref 'ECSCluster'
+            - " >> /etc/ecs/ecs.config\n"
+            - "yum install -y aws-cfn-bootstrap\n"
+            - '/opt/aws/bin/cfn-signal -e $? '
+            - '         --stack '
+            - !Ref 'AWS::StackName'
+            - '         --resource WebAppScalingGroup '
+            - '         --region '
+            - !Ref 'AWS::Region'
+            - "\n"
 Outputs:
